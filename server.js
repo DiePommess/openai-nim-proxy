@@ -120,13 +120,27 @@ app.post('/v1/chat/completions', async (req, res) => {
     };
     
     // Make request to NVIDIA NIM API
-    const response = await axios.post(`${NIM_API_BASE}/chat/completions`, nimRequest, {
-      headers: {
-        'Authorization': `Bearer ${NIM_API_KEY}`,
-        'Content-Type': 'application/json'
-      },
-      responseType: stream ? 'stream' : 'json'
-    });
+    // Debug output
+console.log("========================================");
+console.log("NVIDIA API Request");
+console.log("Base URL:", NIM_API_BASE);
+console.log("Endpoint:", `${NIM_API_BASE}/chat/completions`);
+console.log("Model:", nimModel);
+console.log("Request:");
+console.log(JSON.stringify(nimRequest, null, 2));
+console.log("========================================");
+
+const response = await axios.post(
+  `${NIM_API_BASE}/chat/completions`,
+  nimRequest,
+  {
+    headers: {
+      Authorization: `Bearer ${NIM_API_KEY}`,
+      "Content-Type": "application/json"
+    },
+    responseType: stream ? "stream" : "json"
+  }
+);
     
     if (stream) {
       // Handle streaming response with reasoning
@@ -232,17 +246,39 @@ app.post('/v1/chat/completions', async (req, res) => {
     }
     
   } catch (error) {
-    console.error('Proxy error:', error.message);
-    
-    res.status(error.response?.status || 500).json({
-      error: {
-        message: error.message || 'Internal server error',
-        type: 'invalid_request_error',
-        code: error.response?.status || 500
-      }
-    });
+
+  console.error("========== NVIDIA ERROR ==========");
+  console.error("Message:", error.message);
+
+  if (error.response) {
+    console.error("Status:", error.response.status);
+    console.error("Headers:", error.response.headers);
+    console.error(
+      "Body:",
+      JSON.stringify(error.response.data, null, 2)
+    );
+  } else if (error.request) {
+    console.error("No response received from NVIDIA.");
+    console.error(error.request);
+  } else {
+    console.error("Unexpected error:");
+    console.error(error);
   }
-});
+
+  console.error("==================================");
+
+  res.status(error.response?.status || 500).json({
+    error: {
+      message:
+        error.response?.data?.error?.message ||
+        error.message ||
+        "Internal server error",
+      type: error.response?.data?.error?.type || "invalid_request_error",
+      code: error.response?.status || 500,
+      details: error.response?.data || null
+    }
+  });
+  }
 
 // Catch-all for unsupported endpoints
 app.all('*', (req, res) => {
