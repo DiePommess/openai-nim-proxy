@@ -267,7 +267,7 @@ const response = await axios.post(
 
   console.error("==================================");
 
-  res.status(error.response?.status || 500).json({
+    res.status(error.response?.status || 500).json({
     error: {
       message:
         error.response?.data?.error?.message ||
@@ -279,6 +279,9 @@ const response = await axios.post(
     }
   });
   }
+}); // <-- THIS WAS MISSING
+
+// Catch-all for unsupported endpoints
 
 // Catch-all for unsupported endpoints
 app.all('*', (req, res) => {
