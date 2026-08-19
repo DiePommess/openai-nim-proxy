@@ -21,7 +21,7 @@ const SHOW_REASONING = false; // Set to true to show reasoning with <think> tags
 const ENABLE_THINKING_MODE = false; // Set to true to enable chat_template_kwargs thinking parameter
 
 // Model mapping (adjust based on available NIM models)
-constconst MODEL_MAPPING = {
+const MODEL_MAPPING = {
   'gpt-3.5-turbo': 'nvidia/nemotron-3-super-120b-a12b',
   'gpt-4': 'nvidia/nemotron-3-ultra-550b-a55b',
   'gpt-3.5': 'qwen/qwen3.5-397b-a17b',
